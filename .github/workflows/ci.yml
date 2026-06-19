@@ -1,0 +1,23 @@
+# Manual-trigger build & test. Promote to push/PR triggers at public launch.
+name: ci
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: build & test (std-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # v0 is pure std with no dependencies (the grid solver is in-tree). When
+      # DEF-based placement lands, this engine gains a vyges-tools/loom path dep
+      # and CI will fetch + repoint it, like the other engines.
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo build --locked --verbose
+      - name: Test
+        run: cargo test --locked --verbose

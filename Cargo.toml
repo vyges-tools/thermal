@@ -1,0 +1,23 @@
+[package]
+name = "vyges-thermal"
+version = "0.0.1"
+edition = "2021"
+description = "Steady-state on-chip thermal analysis: per-tile temperature + hotspot from a floorplan power map, with electro-thermal coupling."
+license = "Apache-2.0"
+authors = ["Vyges <https://vyges.com/contact>"]
+homepage = "https://vyges.com"
+repository = "https://github.com/vyges-tools/thermal"
+
+# Pure std — builds and tests offline, no deps. The grid solver is the electrical
+# DUAL of vyges-em-ir's PDN solver (G_th·T = P  ≡  G·V = I), so the same SPD
+# Gauss-Seidel kernel applies. DEF-based instance placement via the vyges-loom
+# foundation (instead of a described floorplan) is the reserved next step.
+[dependencies]
+
+[[bin]]
+name = "vyges-thermal"
+path = "src/main.rs"
+
+[lib]
+name = "vyges_thermal"
+path = "src/lib.rs"
