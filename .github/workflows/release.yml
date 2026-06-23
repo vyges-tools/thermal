@@ -35,16 +35,6 @@ jobs:
           want="${{ inputs.tag || github.ref_name }}"; want="${want#v}"
           have="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')"
           [ "$want" = "$have" ] || { echo "::error::tag v$want != Cargo.toml version $have — bump [package] version"; exit 1; }
-      # dep-mode: fetch the shared foundation and repoint the dev path dep at it
-      # (vyges-tools/loom is public at launch -> anonymous; pre-launch add a `token:`).
-      - name: Fetch the vyges-tools/loom foundation
-        uses: actions/checkout@v4
-        with:
-          repository: vyges-tools/loom
-          path: .deps/vyges-tools-loom
-      - name: Repoint the path dependency at the CI checkout
-        shell: bash
-        run: sed -i.bak 's#\.\./vyges-tools-loom#.deps/vyges-tools-loom#' Cargo.toml && rm -f Cargo.toml.bak
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
