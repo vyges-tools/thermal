@@ -79,6 +79,22 @@ Floorplan placement is a described `.flp`; **DEF-based placement via the
 is next. Transient response and feeding temperature-dependent wire resistance back
 into `vyges-em-ir` are reserved.
 
+## Domain coverage — digital *and* analog / mixed-signal
+
+The solve is **physics and geometry only**: `G_th · ΔT = P` over a tile grid, fed
+by a generic `.flp` power map (`name x y w h power [leak]`). Nothing in the path
+assumes standard cells, a clock, or a digital netlist — the *only* requirement is
+per-block power, from any source. So the same engine runs on **analog and
+mixed-signal** blocks exactly as it does on digital ones: see
+[`examples/pa/`](examples/pa/), an RF power amplifier whose output stage is the
+hotspot (peak ~93 °C, located on the PA block), authored as a plain `.flp` with no
+engine change. `vyges-power` is the conventional upstream that supplies that map,
+but any power source works.
+
+Scope honestly: this is **thermal (physical) analysis** — temperature field +
+hotspot + a sign-off gate. It is *not* analog functional sign-off (no AC/transient
+electrical behaviour); for analog the input is just a power map like any other.
+
 ## Correlation
 
 **HotSpot** (UVA) — the canonical open on-chip thermal simulator — is the baseline

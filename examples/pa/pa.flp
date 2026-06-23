@@ -1,0 +1,10 @@
+# An analog RF power-amplifier floorplan on a 600 µm die.
+# A thermal solve only needs per-block power + geometry, so an analog power map
+# is just another `.flp` — no engine change. The PA output stage is the hotspot:
+# it dissipates an order of magnitude more than the bias/driver/LDO around it.
+# name      x_um  y_um  w_um  h_um  power_w  leak_w
+pa_output   240   240   120   120   1.20     0.10
+driver      120   240   100   120   0.18     0.02
+bias        240   120   120   100   0.04     0.01
+ldo         120   120   100   100   0.06     0.03
+balun       400   240   140   140   0.01
