@@ -1,6 +1,6 @@
 [package]
 name = "vyges-thermal"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 description = "Steady-state on-chip thermal analysis: per-tile temperature + hotspot from a floorplan power map, with electro-thermal coupling."
 license = "Apache-2.0"
