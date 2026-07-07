@@ -130,6 +130,30 @@ fn emit(rep: &ThermalReport, cli: &Cli) -> ! {
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+
+    if args.iter().any(|a| a == "--describe") {
+        // Machine-readable description of `run` for tooling that drives it.
+        const DESCRIBE: &str = r#"{
+  "name": "thermal",
+  "summary": "steady-state on-chip thermal analysis (floorplan -> temperature)",
+  "invocation": {
+    "args_template": ["run", "{job}"],
+    "emits_json": true
+  },
+  "inputs": {
+    "type": "object",
+    "required": ["job"],
+    "properties": {
+      "job": { "type": "string", "description": "path to a .thermal job file (die + grid + material params + a floorplan of blocks with placement and power)" }
+    }
+  },
+  "artifacts": []
+}
+"#;
+        print!("{DESCRIBE}");
+        return;
+    }
+
     let cli = parse_cli(&args);
 
     if cli.bug_report {
