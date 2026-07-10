@@ -147,7 +147,7 @@ fn main() {
       "job": { "type": "string", "description": "path to a .thermal job file (die + grid + material params + a floorplan of blocks with placement and power)" }
     }
   },
-  "artifacts": []
+  "artifacts": [ { "role": "thermal_report" } ]
 }
 "#;
         print!("{DESCRIBE}");
