@@ -34,6 +34,7 @@ flags:
   --fail-on-violation   exit 3 if the peak temperature exceeds t_limit_c
   -q, --quiet           suppress non-essential output
   -v, --verbose         extra detail on stderr
+  --describe            print a machine-readable JSON description of the command
   -h, --help            show this help
   -V, --version         show version
   --bug-report      file a bug (central: vyges/community)
