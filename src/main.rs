@@ -117,7 +117,51 @@ fn write_out(text: &str, cli: &Cli) {
     }
 }
 
+/// Emit the vyges-events causal trail for the thermal verdict — to stderr (the
+/// report goes to stdout / -o). code=THERMAL-* is the clustering key; objects are
+/// the block/coordinate refs used for cross-stage co-reference. One warn per block
+/// over `t_limit_c`, then always a completion summary (peak temp + hotspot count).
+fn emit_thermal_events(rep: &ThermalReport) {
+    use vyges_events::{Event, Severity};
+    let mut hotspots = 0usize;
+    for b in &rep.blocks {
+        if b.temp_c > rep.t_limit_c {
+            hotspots += 1;
+            vyges_events::emit(
+                &Event::new(
+                    "vyges-thermal",
+                    Severity::Warn,
+                    format!(
+                        "hotspot '{}' at {:.2} °C exceeds limit {:.2} °C ({:.4} W)",
+                        b.name, b.temp_c, rep.t_limit_c, b.power_w
+                    ),
+                )
+                .with_code("THERMAL-HOTSPOT")
+                .with_objects(vec![format!("block:{}", b.name)]),
+            );
+        }
+    }
+    vyges_events::emit(
+        &Event::new(
+            "vyges-thermal",
+            Severity::Info,
+            format!(
+                "thermal {} — peak {:.2} °C at ({:.1}, {:.1}) µm, {} hotspot(s) over {:.2} °C limit",
+                if rep.passes() { "PASS" } else { "FAIL" },
+                rep.tmax_c,
+                rep.hot_x_um,
+                rep.hot_y_um,
+                hotspots,
+                rep.t_limit_c
+            ),
+        )
+        .with_code("THERMAL-DONE")
+        .with_objects(vec![format!("hotspot:{:.1},{:.1}", rep.hot_x_um, rep.hot_y_um)]),
+    );
+}
+
 fn emit(rep: &ThermalReport, cli: &Cli) -> ! {
+    emit_thermal_events(rep); // vyges-events causal trail on stderr; the report goes to stdout / -o
     let text = if cli.json { engine::report_json(rep) } else { engine::render_report(rep) };
     write_out(&text, cli);
     if cli.fail_on_violation && !engine::passes(rep) {
