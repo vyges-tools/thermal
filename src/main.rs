@@ -206,6 +206,11 @@ fn main() {
     }
   },
   "artifacts": [ { "role": "thermal_report", "from_arg": "out" } ],
+  "assertion": {
+    "id": "thermal-within-limit",
+    "field": "pass",
+    "pass_when": { "is_true": true }
+  },
   "consumes": ["floorplan", "power_report"]
 }
 "#;
