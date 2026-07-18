@@ -219,6 +219,10 @@ fn main() {
         const DESCRIBE: &str = r#"{
   "name": "thermal",
   "summary": "steady-state on-chip thermal analysis (floorplan -> temperature)",
+  "maturity": "workflow-validated",
+  "provenance_limitations": [
+      "The job names the floorplan and per-block power; input_hash covers the job path and arguments, not their contents."
+  ],
   "invocation": {
     "args_template": ["run", "{job}"],
     "optional": [ { "arg": "out", "flag": "-o" } ],
