@@ -68,7 +68,11 @@ pub fn render_report(rep: &ThermalReport) -> String {
     } else {
         String::new()
     };
-    s.push_str(&format!("  total power      {}{}\n", fmt_power(rep.total_power_w), drop));
+    s.push_str(&format!(
+        "  total power      {}{}\n",
+        fmt_power(rep.total_power_w),
+        drop
+    ));
     let cpl = if rep.coupled {
         format!(" ({} coupling iters)", rep.couple_iters)
     } else {
@@ -85,7 +89,10 @@ pub fn render_report(rep: &ThermalReport) -> String {
         let mut blks: Vec<_> = rep.blocks.iter().collect();
         blks.sort_by(|a, b| b.temp_c.partial_cmp(&a.temp_c).unwrap());
         s.push_str("\n  hottest blocks:\n");
-        s.push_str(&format!("    {:<16} {:>9}  {:>10}\n", "block", "temp", "power"));
+        s.push_str(&format!(
+            "    {:<16} {:>9}  {:>10}\n",
+            "block", "temp", "power"
+        ));
         for b in blks.iter().take(8) {
             s.push_str(&format!(
                 "    {:<16} {:>6.2} °C  {:>10}\n",
@@ -127,11 +134,17 @@ pub fn report_json(rep: &ThermalReport) -> String {
     s.push_str(&format!("\"ambient_c\":{},", rep.ambient_c));
     s.push_str(&format!("\"t_limit_c\":{},", rep.t_limit_c));
     s.push_str(&format!("\"tmax_c\":{:.6},", rep.tmax_c));
-    s.push_str(&format!("\"hot_x_um\":{:.3},\"hot_y_um\":{:.3},", rep.hot_x_um, rep.hot_y_um));
+    s.push_str(&format!(
+        "\"hot_x_um\":{:.3},\"hot_y_um\":{:.3},",
+        rep.hot_x_um, rep.hot_y_um
+    ));
     s.push_str(&format!("\"pass\":{},", rep.passes()));
     s.push_str(&format!("\"total_power_w\":{:.9},", rep.total_power_w));
     s.push_str(&format!("\"dropped_w\":{:.9},", rep.dropped_w));
-    s.push_str(&format!("\"coupled\":{},\"couple_iters\":{},", rep.coupled, rep.couple_iters));
+    s.push_str(&format!(
+        "\"coupled\":{},\"couple_iters\":{},",
+        rep.coupled, rep.couple_iters
+    ));
     s.push_str(&format!("\"grid\":[{},{}],", rep.nx, rep.ny));
     s.push_str("\"blocks\":[");
     for (i, b) in rep.blocks.iter().enumerate() {

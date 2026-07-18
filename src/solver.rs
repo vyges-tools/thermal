@@ -35,7 +35,10 @@ impl std::fmt::Display for SolveError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SolveError::Singular(k) => {
-                write!(f, "singular thermal grid: tile index {k} has no path to ambient")
+                write!(
+                    f,
+                    "singular thermal grid: tile index {k} has no path to ambient"
+                )
             }
             SolveError::NotConverged(r) => write!(f, "solver did not converge (residual {r:.3e})"),
         }
@@ -45,7 +48,12 @@ impl std::error::Error for SolveError {}
 
 impl LinSys {
     pub fn new(n: usize) -> LinSys {
-        LinSys { n, diag: vec![0.0; n], offdiag: vec![Vec::new(); n], rhs: vec![0.0; n] }
+        LinSys {
+            n,
+            diag: vec![0.0; n],
+            offdiag: vec![Vec::new(); n],
+            rhs: vec![0.0; n],
+        }
     }
 
     /// Solve via Gauss-Seidel. `tol` is the max per-node update; `max_iter` caps work.
@@ -89,7 +97,11 @@ mod tests {
         s.diag[0] = 0.04; // g = 1/25 (theta_ja = 25 K/W)
         s.rhs[0] = 2.0; // 2 W
         let t = s.solve(1000, 1e-12).unwrap();
-        assert!((t[0] - 50.0).abs() < 1e-6, "2 W * 25 K/W = 50 K, got {}", t[0]);
+        assert!(
+            (t[0] - 50.0).abs() < 1e-6,
+            "2 W * 25 K/W = 50 K, got {}",
+            t[0]
+        );
     }
 
     // Two tiles, symmetric: each has vertical g_v and they share a lateral g_l.

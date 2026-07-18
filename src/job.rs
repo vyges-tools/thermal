@@ -57,8 +57,12 @@ fn two(s: &str, key: &str) -> Result<(f64, f64), JobError> {
     let t: Vec<&str> = s.split_whitespace().collect();
     match t.as_slice() {
         [a, b] => {
-            let a = a.parse().map_err(|_| JobError(format!("bad {key}: {s:?}")))?;
-            let b = b.parse().map_err(|_| JobError(format!("bad {key}: {s:?}")))?;
+            let a = a
+                .parse()
+                .map_err(|_| JobError(format!("bad {key}: {s:?}")))?;
+            let b = b
+                .parse()
+                .map_err(|_| JobError(format!("bad {key}: {s:?}")))?;
             Ok((a, b))
         }
         _ => Err(JobError(format!("{key} needs two values, got {s:?}"))),
@@ -78,7 +82,11 @@ impl ThermalJob {
                 .ok_or_else(|| JobError(format!("expected 'key: value', got {line:?}")))?;
             kv.insert(k.trim().to_lowercase(), v.trim().to_string());
         }
-        let get = |k: &str| kv.get(k).cloned().ok_or_else(|| JobError(format!("missing key: {k}")));
+        let get = |k: &str| {
+            kv.get(k)
+                .cloned()
+                .ok_or_else(|| JobError(format!("missing key: {k}")))
+        };
         let num = |k: &str, d: f64| kv.get(k).and_then(|s| s.parse().ok()).unwrap_or(d);
 
         let (die_w_um, die_h_um) = two(&get("die_um")?, "die_um")?;
@@ -108,14 +116,19 @@ impl ThermalJob {
             return Err(JobError("die_um must be positive".into()));
         }
         if job.theta_ja <= 0.0 || job.k_si <= 0.0 || job.thickness_um <= 0.0 {
-            return Err(JobError("k_si, thickness_um, theta_ja must be positive".into()));
+            return Err(JobError(
+                "k_si, thickness_um, theta_ja must be positive".into(),
+            ));
         }
         Ok(job)
     }
 
     pub fn load(path: &str) -> Result<ThermalJob, JobError> {
         let text = std::fs::read_to_string(path).map_err(|e| JobError(format!("{path}: {e}")))?;
-        let base = Path::new(path).parent().and_then(|p| p.to_str()).unwrap_or(".");
+        let base = Path::new(path)
+            .parent()
+            .and_then(|p| p.to_str())
+            .unwrap_or(".");
         ThermalJob::parse(&text, base)
     }
 
@@ -123,7 +136,10 @@ impl ThermalJob {
         if Path::new(rel).is_absolute() || self.base_dir.is_empty() {
             rel.to_string()
         } else {
-            Path::new(&self.base_dir).join(rel).to_string_lossy().into_owned()
+            Path::new(&self.base_dir)
+                .join(rel)
+                .to_string_lossy()
+                .into_owned()
         }
     }
 }

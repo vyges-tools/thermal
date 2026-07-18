@@ -77,7 +77,11 @@ impl Floorplan {
                     .map_err(|_| FloorplanError(format!("line {}: bad {what}: {s:?}", lineno + 1)))
             };
             let power_w = num(t[5], "power")?;
-            let leak_w = if t.len() >= 7 { num(t[6], "leak")? } else { 0.0 };
+            let leak_w = if t.len() >= 7 {
+                num(t[6], "leak")?
+            } else {
+                0.0
+            };
             blocks.push(Block {
                 name: t[0].to_string(),
                 x_um: num(t[1], "x")?,
@@ -105,10 +109,8 @@ mod tests {
 
     #[test]
     fn parses_blocks_and_optional_leak() {
-        let f = Floorplan::parse(
-            "# c\nclkbuf 10 10 5 5 4.0e-3 2.0e-3\nu0 20 10 5 5 0.8e-3\n",
-        )
-        .unwrap();
+        let f =
+            Floorplan::parse("# c\nclkbuf 10 10 5 5 4.0e-3 2.0e-3\nu0 20 10 5 5 0.8e-3\n").unwrap();
         assert_eq!(f.blocks.len(), 2);
         assert_eq!(f.blocks[0].name, "clkbuf");
         assert!((f.blocks[0].leak_w - 2.0e-3).abs() < 1e-12);

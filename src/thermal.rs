@@ -186,10 +186,17 @@ impl std::fmt::Display for ThermalError {
 impl std::error::Error for ThermalError {}
 
 /// Solve the grid for the given per-block powers; returns absolute temperatures.
-fn solve_grid(job: &ThermalJob, grid: &Grid, fp: &Floorplan, bp: &[f64]) -> Result<(Vec<f64>, f64), ThermalError> {
+fn solve_grid(
+    job: &ThermalJob,
+    grid: &Grid,
+    fp: &Floorplan,
+    bp: &[f64],
+) -> Result<(Vec<f64>, f64), ThermalError> {
     let (tile_power, dropped) = distribute(grid, fp, bp);
     let sys = build_system(grid, &tile_power);
-    let rise = sys.solve(MAX_SOLVER_ITER, SOLVER_TOL_K).map_err(ThermalError::Solve)?;
+    let rise = sys
+        .solve(MAX_SOLVER_ITER, SOLVER_TOL_K)
+        .map_err(ThermalError::Solve)?;
     let temp: Vec<f64> = rise.iter().map(|r| job.ambient_c + r).collect();
     Ok((temp, dropped))
 }
@@ -297,8 +304,7 @@ mod tests {
         let j = job(8, 8, 25.0);
         let fp = Floorplan::parse("blk 0 0 100 100 2.0\n").unwrap();
         let r = analyze(&j, &fp).unwrap();
-        let mean_rise: f64 =
-            r.temp_c.iter().map(|t| t - 25.0).sum::<f64>() / r.temp_c.len() as f64;
+        let mean_rise: f64 = r.temp_c.iter().map(|t| t - 25.0).sum::<f64>() / r.temp_c.len() as f64;
         assert!((mean_rise - 50.0).abs() < 1e-3, "mean rise {mean_rise}");
         // a centred point source makes the centre hotter than the mean
         assert!(r.tmax_c - 25.0 > mean_rise);
@@ -314,7 +320,12 @@ mod tests {
         j.leak_alpha_per_c = 0.005; // 0.5%/°C
         let coupled = analyze(&j, &fp).unwrap();
         assert!(coupled.coupled && coupled.couple_iters > 0);
-        assert!(coupled.tmax_c > base.tmax_c, "{} !> {}", coupled.tmax_c, base.tmax_c);
+        assert!(
+            coupled.tmax_c > base.tmax_c,
+            "{} !> {}",
+            coupled.tmax_c,
+            base.tmax_c
+        );
         assert!(coupled.total_power_w > 1.0, "leakage grew with T");
     }
 
@@ -324,6 +335,10 @@ mod tests {
         // block half off the right edge -> ~half its power dropped
         let fp = Floorplan::parse("blk 90 0 20 20 1.0\n").unwrap();
         let r = analyze(&j, &fp).unwrap();
-        assert!(r.dropped_w > 0.4 && r.dropped_w < 0.6, "dropped {}", r.dropped_w);
+        assert!(
+            r.dropped_w > 0.4 && r.dropped_w < 0.6,
+            "dropped {}",
+            r.dropped_w
+        );
     }
 }

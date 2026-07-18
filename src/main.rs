@@ -53,7 +53,11 @@ fn link(label: &str, url: &str) {
     use std::io::IsTerminal;
     println!("{label}:\n  {url}");
     if std::io::stdout().is_terminal() {
-        let opener = if cfg!(target_os = "macos") { "open" } else { "xdg-open" };
+        let opener = if cfg!(target_os = "macos") {
+            "open"
+        } else {
+            "xdg-open"
+        };
         let _ = std::process::Command::new(opener).arg(url).status();
     }
 }
@@ -162,11 +166,18 @@ fn emit_thermal_events(rep: &ThermalReport) {
 
 fn emit(rep: &ThermalReport, cli: &Cli) -> ! {
     emit_thermal_events(rep); // vyges-events causal trail on stderr; the report goes to stdout / -o
-    let text = if cli.json { engine::report_json(rep) } else { engine::render_report(rep) };
+    let text = if cli.json {
+        engine::report_json(rep)
+    } else {
+        engine::render_report(rep)
+    };
     write_out(&text, cli);
     if cli.fail_on_violation && !engine::passes(rep) {
         if !cli.quiet {
-            eprintln!("thermal VIOLATED: peak {:.2} °C > {:.2} °C limit", rep.tmax_c, rep.t_limit_c);
+            eprintln!(
+                "thermal VIOLATED: peak {:.2} °C > {:.2} °C limit",
+                rep.tmax_c, rep.t_limit_c
+            );
         }
         exit(3);
     }
@@ -183,16 +194,18 @@ fn main() {
   "summary": "steady-state on-chip thermal analysis (floorplan -> temperature)",
   "invocation": {
     "args_template": ["run", "{job}"],
+    "optional": [ { "arg": "out", "flag": "-o" } ],
     "emits_json": true
   },
   "inputs": {
     "type": "object",
     "required": ["job"],
     "properties": {
-      "job": { "type": "string", "description": "path to a .thermal job file (die + grid + material params + a floorplan of blocks with placement and power)" }
+      "job": { "type": "string", "description": "path to a .thermal job file (die + grid + material params + a floorplan of blocks with placement and power)" },
+      "out": { "type": "string", "description": "write the report to FILE instead of stdout" }
     }
   },
-  "artifacts": [ { "role": "thermal_report" } ],
+  "artifacts": [ { "role": "thermal_report", "from_arg": "out" } ],
   "consumes": ["floorplan", "power_report"]
 }
 "#;
@@ -215,7 +228,11 @@ fn main() {
         return link("Star vyges-thermal on GitHub ⭐", STAR_URL);
     }
     if cli.version {
-        println!("vyges-thermal {} ({})", vyges_thermal::VERSION, env!("VYGES_GIT_SHA"));
+        println!(
+            "vyges-thermal {} ({})",
+            vyges_thermal::VERSION,
+            env!("VYGES_GIT_SHA")
+        );
         println!("{}", vyges_thermal::COPYRIGHT);
         return;
     }
@@ -238,7 +255,14 @@ fn main() {
             match ThermalJob::load(path) {
                 Ok(j) => println!(
                     "OK  design={} floorplan={} die={}×{}µm grid={}×{} theta_ja={} t_limit={}°C",
-                    j.design, j.floorplan, j.die_w_um, j.die_h_um, j.nx, j.ny, j.theta_ja, j.t_limit_c
+                    j.design,
+                    j.floorplan,
+                    j.die_w_um,
+                    j.die_h_um,
+                    j.nx,
+                    j.ny,
+                    j.theta_ja,
+                    j.t_limit_c
                 ),
                 Err(e) => {
                     eprintln!("error: {e}");
