@@ -15,12 +15,12 @@ use vyges_thermal::job::ThermalJob;
 use vyges_thermal::thermal::ThermalReport;
 
 const USAGE: &str = "\
-vyges-thermal — steady-state on-chip thermal analysis (floorplan -> temperature)
+vyges loom thermal — steady-state on-chip thermal analysis (floorplan -> temperature)
 
 usage:
-  vyges-thermal run   JOB [-o OUT] [--json] [--fail-on-violation]
-  vyges-thermal check JOB
-  vyges-thermal demo  [-o OUT] [--json]
+  vyges loom thermal run   JOB [-o OUT] [--json] [--fail-on-violation]
+  vyges loom thermal check JOB
+  vyges loom thermal demo  [-o OUT] [--json]
 
 A JOB is a small declarative `.thermal` file (die + grid + material params +
 a `floorplan:` of blocks with placement and power). With per-block leakage and
