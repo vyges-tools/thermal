@@ -14,6 +14,27 @@ use vyges_thermal::engine;
 use vyges_thermal::job::ThermalJob;
 use vyges_thermal::thermal::ThermalReport;
 
+/// A diagnostic as a structured event (`THERMAL-ERROR`, or `THERMAL-WARNING` for a warning; `vyges-events/1.0`)
+/// instead of a bare stderr line; text after a blank line (the usage) stays plain help.
+fn diag_line(msg: String) {
+    let (head, help) = match msg.split_once("\n\n") {
+        Some((h, rest)) => (h.to_string(), Some(rest.to_string())),
+        None => (msg, None),
+    };
+    let warn = head.starts_with("warning: ");
+    let text = head.strip_prefix("error: ").or_else(|| head.strip_prefix("warning: ")).unwrap_or(&head).to_string();
+    let (severity, code) = if warn { (vyges_events::Severity::Warn, "THERMAL-WARNING") } else { (vyges_events::Severity::Error, "THERMAL-ERROR") };
+    vyges_events::emit(&vyges_events::Event::new("vyges-thermal", severity, text).with_code(code));
+    if let Some(h) = help {
+        eprintln!("{h}");
+    }
+}
+
+macro_rules! diag {
+    ($($t:tt)*) => { diag_line(format!($($t)*)) };
+}
+
+
 const USAGE: &str = "\
 vyges loom thermal — steady-state on-chip thermal analysis (floorplan -> temperature)
 
@@ -140,7 +161,7 @@ fn write_out(text: &str, cli: &Cli) {
                 }
             }
             Err(e) => {
-                eprintln!("error: {path}: {e}");
+                diag!("error: {path}: {e}");
                 exit(1);
             }
         },
@@ -302,7 +323,7 @@ fn main() {
                     j.t_limit_c
                 ),
                 Err(e) => {
-                    eprintln!("error: {e}");
+                    diag!("error: {e}");
                     exit(2);
                 }
             }
@@ -315,7 +336,7 @@ fn main() {
             let job = match ThermalJob::load(path) {
                 Ok(j) => j,
                 Err(e) => {
-                    eprintln!("error: {e}");
+                    diag!("error: {e}");
                     exit(2);
                 }
             };
@@ -325,7 +346,7 @@ fn main() {
             match engine::analyze_job(&job) {
                 Ok(rep) => emit(&rep, &cli),
                 Err(e) => {
-                    eprintln!("error: {e}");
+                    diag!("error: {e}");
                     exit(1);
                 }
             }
