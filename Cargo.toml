@@ -12,6 +12,11 @@ repository = "https://github.com/vyges-tools/thermal"
 # DUAL of vyges-em-ir's PDN solver (G_th·T = P  ≡  G·V = I), so the same SPD
 # Gauss-Seidel kernel applies. DEF-based instance placement via the vyges-loom
 # foundation (instead of a described floorplan) is the reserved next step.
+[features]
+# The command-line entry built into the library too (`cli_main`), for the suite binaries
+# that link every engine and run the one they are invoked as.
+suite = []
+
 [dependencies]
 # Structured events (vyges-events/1.0) for the MCP causal trail. Core-only.
 vyges-events = { git = "https://github.com/vyges-tools/events", branch = "main", default-features = false }
