@@ -1,5 +1,7 @@
 # vyges-thermal
 
+**[Download Loom](https://vyges.com/products/vyges-cli/#install)** · install the free [Vyges CLI](https://vyges.com/products/vyges-cli/), then `vyges install loom`
+
 Steady-state **on-chip thermal analysis**: a floorplan power map in, a die
 **temperature field + hotspot** out — and an **electro-thermal coupling** loop
 (leakage rises with temperature, re-solved to a fixed point). Part of the Vyges
