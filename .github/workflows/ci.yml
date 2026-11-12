@@ -19,7 +19,7 @@ jobs:
       # v0 is pure std with no dependencies (the grid solver is in-tree). When
       # DEF-based placement lands, this engine gains a vyges-tools/loom path dep
       # and CI will fetch + repoint it, like the other engines.
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.100.0
       - name: Build
         run: cargo build --locked --verbose
       - name: Test
