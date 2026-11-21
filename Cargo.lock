@@ -141,8 +141,8 @@ checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
 name = "vyges-events"
-version = "0.1.55"
-source = "git+https://github.com/vyges-tools/events?branch=main#99cbea768cd047d1c028c1d38b441da6be0b9b67"
+version = "0.1.56"
+source = "git+https://github.com/vyges-tools/events?branch=main#fbeaba52516c5a210cf37648edd1327f28596420"
 dependencies = [
  "libc",
  "serde",
